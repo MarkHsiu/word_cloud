@@ -420,6 +420,8 @@ class WordCloud(object):
         # remove 's
         words = [word[:-2] if word.lower().endswith("'s") else word
                  for word in words]
+        # remove numbers
+        words = [word for word in words if not word.isdigit()]
 
         if self.collocations:
             word_counts = unigrams_and_bigrams(words)
