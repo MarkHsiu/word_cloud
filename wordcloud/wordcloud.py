@@ -195,8 +195,11 @@ class WordCloud(object):
 
     Attributes
     ----------
-    ``words_``: list of tuples (string, float)
+    ``words_`` : dict of string to float
         Word tokens with associated frequency.
+
+        .. versionchanged: 2.0
+            ``words_`` is now a dictionary
 
     ``layout_`` : list of tuples (string, int, (int, int), int, color))
         Encodes the fitted word cloud. Encodes for each word the string, font
@@ -230,7 +233,7 @@ class WordCloud(object):
         self.scale = scale
         self.color_func = color_func
         self.max_words = max_words
-        self.stopwords = stopwords or STOPWORDS
+        self.stopwords = stopwords if stopwords is not None else STOPWORDS
         self.min_font_size = min_font_size
         self.font_step = font_step
         self.regexp = regexp
@@ -272,8 +275,8 @@ class WordCloud(object):
 
         Parameters
         ----------
-        frequencies : array of tuples
-            A tuple contains the word and its frequency.
+        frequencies : dict from string to float
+            A contains words and associated frequency.
 
         Returns
         -------
@@ -281,7 +284,7 @@ class WordCloud(object):
 
         """
         # make sure frequencies are sorted and normalized
-        frequencies = sorted(frequencies, key=item1, reverse=True)
+        frequencies = sorted(frequencies.items(), key=item1, reverse=True)
         frequencies = frequencies[:self.max_words]
         # largest entry will be 1
         max_frequency = float(frequencies[0][1])
@@ -289,7 +292,7 @@ class WordCloud(object):
         frequencies = [(word, freq / max_frequency)
                        for word, freq in frequencies]
 
-        self.words_ = frequencies
+        self.words_ = dict(frequencies)
 
         if self.random_state is not None:
             random_state = self.random_state
@@ -444,7 +447,7 @@ class WordCloud(object):
         self
         """
         words = self.process_text(text)
-        self.generate_from_frequencies(words.items())
+        self.generate_from_frequencies(words)
         return self
 
     def generate(self, text):
